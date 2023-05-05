@@ -146,7 +146,7 @@ class UDMISiteModelGenerator:
         },
         "physical_tag": {
           "asset": {
-            "guid": "bim://" + device[self._asset_columns.PHYSICAL_TAG_GUID],
+            "guid": "uuid://" + device[self._asset_columns.PHYSICAL_TAG_GUID],
             "site": device[self._asset_columns.PHYSICAL_TAG_SITE],
             "name": device[self._asset_columns.PHYSICAL_TAG_NAME]
           }
