@@ -4,7 +4,7 @@ This command line program allows to see the message stream of a specific devices
 
 ## Installation
 
-`python3 -m pip install -r requirements`
+`python3 -m pip install -r requirements.txt`
 
 ## Usage
 
