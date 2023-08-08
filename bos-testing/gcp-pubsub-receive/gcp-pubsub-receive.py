@@ -79,7 +79,7 @@ def main():
     TARGET_DEVICE_ID = args.device
 
     # Number of seconds the subscriber should listen for messages
-    TIMEOUT = 60.0
+    TIMEOUT = int(args.timeout)
 
     subscriber = pubsub_v1.SubscriberClient()
     # The `subscription_path` method creates a fully qualified identifier
@@ -87,7 +87,7 @@ def main():
     subscription_path = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)
 
     streaming_pull_future = subscriber.subscribe(subscription_path, callback=callback)
-    print(f"Listening for messages on {subscription_path}..\n")
+    print(f"Listening for messages from {TARGET_DEVICE_ID} on {subscription_path}.\n")
 
     # Wrap subscriber in a 'with' block to automatically call close() when done.
     with subscriber:
