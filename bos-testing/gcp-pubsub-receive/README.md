@@ -26,7 +26,7 @@ $ ./gcp-pubsub-receive.py -h
 |_|  \___|\___\___|_| \_/ \___|
                                
 
-usage: gcp-pubsub-receive.py [-h] [-v] [-p PROJECT] [-s SUB] [-d DEVICE] [-t TIMEOUT]
+usage: gcp-pubsub-receive.py [-h] [-v] [-p PROJECT] [-s SUB] [-d DEVICE] [-g GATEWAY] [-f FOLDER] [-y TYPE] [-t TIMEOUT]
 
 options:
   -h, --help            show this help message and exit
@@ -35,7 +35,24 @@ options:
                         GCP project id (required)
   -s SUB, --sub SUB     GCP PubSub subscription (required)
   -d DEVICE, --device DEVICE
-                        device name or abbreviation (required, for all devices use "all")
+                        device name or abbreviation (optional, if not specified shows all devices)
+  -g GATEWAY, --gateway GATEWAY
+                        filter for the gatewayId attribute (optional)
+  -f FOLDER, --folder FOLDER
+                        filter for the subFolder attribute (optional, if not specified shows messages in all folders)
+  -y TYPE, --type TYPE  filter for the subType attribute (optional)
   -t TIMEOUT, --timeout TIMEOUT
                         time interval in seconds for which to receive messages (optional, default=60 seconds)
+```
+
+### Example: get pointset values for a specific device for 1 hour
+
+```
+python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DEVICE_NAME -f pointset -t 3600
+```
+
+### Example: get state values for a specific device for 1 hour
+
+```
+python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DEVICE_NAME -f system -y state -t 3600
 ```
