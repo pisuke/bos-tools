@@ -1,0 +1,8 @@
+services:
+  bos-modbus-server:
+    build: .
+    image: "bos-modbus-server:latest"
+    restart: always
+    network_mode: "host"
+    ports:
+      - "502:502"

@@ -1,0 +1,7 @@
+BAC0
+bacpypes
+pytz
+#bokeh
+#pandas
+flask
+netifaces

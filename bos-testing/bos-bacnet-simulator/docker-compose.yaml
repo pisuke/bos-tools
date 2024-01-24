@@ -1,0 +1,9 @@
+services:
+  bos-bacnet-server:
+    build: .
+    image: "bos-bacnet-server:latest"
+    restart: always
+    network_mode: "host"
+    ports:
+      - "47808:47808"
+

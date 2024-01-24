@@ -1,0 +1,15 @@
+[Unit]
+Description=BOS BACnet Server
+After=network.target
+
+[Service]
+Type=simple
+User=iot
+WorkingDirectory=/home/iot/Code/bos-bacnet-simulator
+ExecStart=/home/iot/Code/bos-bacnet-simulator/bos-bacnet-server.sh start
+ExecStop=/home/iot/Code/bos-bacnet-simulator/bos-bacnet-server.sh stop
+ExecReload=/home/iot/Code/bos-bacnet-simulator/bos-bacnet-server.sh restart
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

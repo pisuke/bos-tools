@@ -33,13 +33,17 @@ def print_message(message):
   print(body)
   
 
-def callback(message: pubsub_v1.subscriber.message.Message) -> None:
+def message_callback(message: pubsub_v1.subscriber.message.Message) -> None:
     global TARGET_DEVICE_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE
+    
+    # print_message(message)
 
     device_id = message.attributes['deviceId']
     gateway_id = message.attributes['gatewayId']
     sub_folder = message.attributes['subFolder']
     type = message.attributes['subType']
+    
+    # print(device_id, gateway_id, sub_folder, type)
     
     if TARGET_DEVICE_ID in device_id:
       if gateway_id in TARGET_GATEWAY_ID:
@@ -54,7 +58,7 @@ def callback(message: pubsub_v1.subscriber.message.Message) -> None:
             print_message(message)
         elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
           print_message(message)
-    elif TARGET_DEVICE_ID=="":
+    elif TARGET_DEVICE_ID == "":
       if gateway_id in TARGET_GATEWAY_ID:
         if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
           if type == TARGET_TYPE:
@@ -85,8 +89,8 @@ def main():
   parser = argparse.ArgumentParser()
   group = parser.add_mutually_exclusive_group()
   group.add_argument("-v", "--verbose", action="store_true", default=False, help="increase the verbosity level")  
-  parser.add_argument("-p","--project", default="", help="GCP project id (required)")
-  parser.add_argument("-s","--sub", default="", help="GCP PubSub subscription (required)")
+  parser.add_argument("-p", "--project", default="", help="GCP project id (required)")
+  parser.add_argument("-s", "--sub", default="", help="GCP PubSub subscription (required)")
   parser.add_argument("-d", "--device",  default="", help="device name or abbreviation (optional, if not specified shows all devices)")
   parser.add_argument("-g", "--gateway", default="", help="filter for the gatewayId attribute (optional)")
   parser.add_argument("-f", "--folder", default="", help="filter for the subFolder attribute (optional, if not specified shows messages in all folders)")
@@ -116,8 +120,11 @@ def main():
     # in the form `projects/{project_id}/subscriptions/{subscription_id}`
     subscription_path = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)
 
-    streaming_pull_future = subscriber.subscribe(subscription_path, callback=callback)
-    print(f"Listening for messages from {TARGET_DEVICE_ID} on {subscription_path}.\n")
+    streaming_pull_future = subscriber.subscribe(subscription_path, callback=message_callback)
+    if TARGET_DEVICE_ID == "":
+      print(f"Listening for messages from all devices on {subscription_path}\n")
+    else:
+      print(f"Listening for messages from {TARGET_DEVICE_ID} on {subscription_path}\n")
 
     # Wrap subscriber in a 'with' block to automatically call close() when done.
     with subscriber:
