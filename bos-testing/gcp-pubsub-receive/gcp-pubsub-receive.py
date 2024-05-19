@@ -164,8 +164,6 @@ def main():
     TARGET_POINT_NAME = args.pointname
     USE_REGEX = args.regex
 
-    print(USE_REGEX)
-
     # Number of seconds the subscriber should listen for messages
     TIMEOUT = int(args.timeout)
 
