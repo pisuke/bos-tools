@@ -26,9 +26,9 @@ $ ./gcp-pubsub-receive.py -h
 |_|  \___|\___\___|_| \_/ \___|
                                
 
-usage: gcp-pubsub-receive.py [-h] [-v] [-p PROJECT] [-s SUB] [-d DEVICE] [-g GATEWAY] [-f FOLDER] [-y TYPE] [-t TIMEOUT]
+usage: gcp-pubsub-receive.py [-h] [-v] [-p PROJECT] [-s SUB] [-d DEVICE] [-g GATEWAY] [-f FOLDER] [-y TYPE] [-n POINTNAME] [-r] [-t TIMEOUT]
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         increase the verbosity level
   -p PROJECT, --project PROJECT
@@ -41,18 +41,33 @@ options:
   -f FOLDER, --folder FOLDER
                         filter for the subFolder attribute (optional, if not specified shows messages in all folders)
   -y TYPE, --type TYPE  filter for the subType attribute (optional)
+  -n POINTNAME, --pointname POINTNAME
+                        filter for the point name (optional)
+  -r, --regex           filter device or gateway by regex (default is false)
   -t TIMEOUT, --timeout TIMEOUT
-                        time interval in seconds for which to receive messages (optional, default=60 seconds)
+                        time interval in seconds for which to receive messages (optional, default=3600 seconds)
 ```
 
-### Example: get pointset values for a specific device for 1 hour
+### Example: get pointset values for any DDC device for 30 minutes 
 
 ```
-python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DEVICE_NAME -f pointset -t 3600
+python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DDC -f pointset -t 1800
 ```
 
-### Example: get state values for a specific device for 1 hour
+### Example: get pointset values for a specific device DDC-12 for 1 hour
 
 ```
-python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DEVICE_NAME -f system -y state -t 3600
+python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DDC-12$ -r -f pointset -t 3600
+```
+
+### Example: get a the point value "temperature_sensor" for a specific device DDC-12 for 1 hour
+
+```
+python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DDC-12$ -r -f pointset -t 3600 -n temperature_sensor
+```
+
+### Example: get state values for a specific device DDC-12 for 1 hour
+
+```
+python3 gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -d DDC-12$ -r -f system -y state -t 3600
 ```

@@ -21,6 +21,7 @@ from concurrent.futures import TimeoutError
 from google.cloud import pubsub_v1
 import argparse
 import json
+import re
 from tabulate import tabulate
 from pyfiglet import *
 
@@ -29,6 +30,7 @@ TARGET_GATEWAY_ID = ""
 TARGET_SUBFOLDER = ""
 TARGET_TYPE = ""
 TARGET_POINT_NAME = ""
+USE_REGEX = False
 
 def print_message(message, pointname):
   body = message.data
@@ -56,40 +58,67 @@ def print_message(message, pointname):
     
 
 def message_callback(message: pubsub_v1.subscriber.message.Message) -> None:
-    global TARGET_DEVICE_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME
+    global TARGET_DEVICE_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME, USE_REGEX
 
     device_id = message.attributes['deviceId']
     gateway_id = message.attributes['gatewayId']
     sub_folder = message.attributes['subFolder']
     type = message.attributes['subType']
     
-    
-    if TARGET_DEVICE_ID in device_id:
-      if gateway_id in TARGET_GATEWAY_ID:
-        if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
-          if type == TARGET_TYPE:
+    if USE_REGEX:
+      if re.search(TARGET_DEVICE_ID, device_id):
+        if re.search(TARGET_GATEWAY_ID, gateway_id):
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
             print_message(message, TARGET_POINT_NAME)
-        elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
-          print_message(message, TARGET_POINT_NAME)
-      elif TARGET_GATEWAY_ID == "":
-        if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
-          if type == TARGET_TYPE:
+        elif TARGET_GATEWAY_ID == "":
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
             print_message(message, TARGET_POINT_NAME)
-        elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
-          print_message(message, TARGET_POINT_NAME)
-    elif TARGET_DEVICE_ID == "":
-      if gateway_id in TARGET_GATEWAY_ID:
-        if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
-          if type == TARGET_TYPE:
+      elif TARGET_DEVICE_ID == "":
+        if re.search(TARGET_GATEWAY_ID, gateway_id):
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
             print_message(message, TARGET_POINT_NAME)
-        elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
-          print_message(message, TARGET_POINT_NAME)
-      elif TARGET_GATEWAY_ID == "":
-        if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
-          if type == TARGET_TYPE:
+        elif TARGET_GATEWAY_ID == "":
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
             print_message(message, TARGET_POINT_NAME)
-        elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
-          print_message(message, TARGET_POINT_NAME)
+    else:
+      if TARGET_DEVICE_ID in device_id:
+        if gateway_id in TARGET_GATEWAY_ID:
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
+            print_message(message, TARGET_POINT_NAME)
+        elif TARGET_GATEWAY_ID == "":
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
+            print_message(message, TARGET_POINT_NAME)
+      elif TARGET_DEVICE_ID == "":
+        if gateway_id in TARGET_GATEWAY_ID:
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
+            print_message(message, TARGET_POINT_NAME)
+        elif TARGET_GATEWAY_ID == "":
+          if sub_folder == TARGET_SUBFOLDER and TARGET_SUBFOLDER != "":
+            if type == TARGET_TYPE:
+              print_message(message, TARGET_POINT_NAME)
+          elif TARGET_SUBFOLDER == "" and TARGET_TYPE == "":
+            print_message(message, TARGET_POINT_NAME)
     message.ack()
 
 
@@ -101,7 +130,7 @@ def show_title():
   print(f1.renderText('receive'))
 
 def main():
-  global TARGET_DEVICE_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME
+  global TARGET_DEVICE_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME, USE_REGEX
       
   show_title()
 
@@ -115,7 +144,8 @@ def main():
   parser.add_argument("-f", "--folder", default="", help="filter for the subFolder attribute (optional, if not specified shows messages in all folders)")
   parser.add_argument("-y", "--type", default="", help="filter for the subType attribute (optional)")
   parser.add_argument("-n", "--pointname", default="", help="filter for the point name (optional)")
-  parser.add_argument("-t", "--timeout", default="60", help="time interval in seconds for which to receive messages (optional, default=60 seconds)")
+  parser.add_argument("-r", "--regex", action="store_true", default=False, help="filter device or gateway by regex (default is false)")
+  parser.add_argument("-t", "--timeout", default="3600", help="time interval in seconds for which to receive messages (optional, default=3600 seconds)")
 
   args = parser.parse_args()
 
@@ -132,6 +162,9 @@ def main():
     TARGET_SUBFOLDER = args.folder
     TARGET_TYPE = args.type
     TARGET_POINT_NAME = args.pointname
+    USE_REGEX = args.regex
+
+    print(USE_REGEX)
 
     # Number of seconds the subscriber should listen for messages
     TIMEOUT = int(args.timeout)
