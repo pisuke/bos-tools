@@ -108,7 +108,7 @@ Timestamp                    Device ID  Gateway ID  Subfolder  Type  Point name 
 ---------------------------  ---------  ----------  ---------  ----  -----------------------------------  -----------
 ```
 
-### Output for all payloadds from a single device
+### Output for all payloads from a single device
 
 ```
 % ./gcp-pubsub-receive.py -p PROJECT_NAME -s SUBSCRIPTION_NAME -t 3600 -f pointset -d FCU-2$ -r
