@@ -26,6 +26,7 @@ from tabulate import tabulate
 from pyfiglet import *
 
 TARGET_DEVICE_ID = ""
+TARGET_REGISTRY_ID = ""
 TARGET_GATEWAY_ID = ""
 TARGET_SUBFOLDER = ""
 TARGET_TYPE = ""
@@ -38,7 +39,10 @@ def print_message(message, pointname):
   gateway_id = message.attributes['gatewayId']
   sub_folder = message.attributes['subFolder']
   type = message.attributes['subType']
-  timestamp = json.loads(body)['timestamp']
+  try:
+    timestamp = json.loads(body)['timestamp']
+  except:
+    timestamp = ""
   
   if pointname != "":
     pointset = json.loads(body)['points']
@@ -58,11 +62,13 @@ def print_message(message, pointname):
     
 
 def message_callback(message: pubsub_v1.subscriber.message.Message) -> None:
-    global TARGET_DEVICE_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME, USE_REGEX
+    global TARGET_DEVICE_ID, TARGET_REGISTRY_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME, USE_REGEX
 
     device_id = message.attributes['deviceId']
+    registry_id = message.attributes['deviceRegistryId']
     gateway_id = message.attributes['gatewayId']
     sub_folder = message.attributes['subFolder']
+    
     type = message.attributes['subType']
     
     if USE_REGEX:
@@ -130,7 +136,7 @@ def show_title():
   print(f1.renderText('receive'))
 
 def main():
-  global TARGET_DEVICE_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME, USE_REGEX
+  global TARGET_DEVICE_ID, TARGET_REGISTRY_ID, TARGET_GATEWAY_ID, TARGET_SUBFOLDER, TARGET_TYPE, TARGET_POINT_NAME, USE_REGEX
       
   show_title()
 
@@ -140,11 +146,12 @@ def main():
   parser.add_argument("-p", "--project", default="", help="GCP project id (required)")
   parser.add_argument("-s", "--sub", default="", help="GCP PubSub subscription (required)")
   parser.add_argument("-d", "--device",  default="", help="device name or abbreviation (optional, if not specified shows all devices)")
+  parser.add_argument("-r", "--registry",  default="", help="registry name (optional, if not specified shows all devices)")
   parser.add_argument("-g", "--gateway", default="", help="filter for the gatewayId attribute (optional)")
   parser.add_argument("-f", "--folder", default="", help="filter for the subFolder attribute (optional, if not specified shows messages in all folders)")
   parser.add_argument("-y", "--type", default="", help="filter for the subType attribute (optional)")
   parser.add_argument("-n", "--pointname", default="", help="filter for the point name (optional)")
-  parser.add_argument("-r", "--regex", action="store_true", default=False, help="filter device or gateway by regex (default is false)")
+  parser.add_argument("-x", "--regex", action="store_true", default=False, help="filter device or gateway by regex (default is false)")
   parser.add_argument("-t", "--timeout", default="3600", help="time interval in seconds for which to receive messages (optional, default=3600 seconds)")
 
   args = parser.parse_args()
@@ -158,6 +165,7 @@ def main():
     PROJECT_ID = args.project
     SUBSCRIPTION_ID = args.sub
     TARGET_DEVICE_ID = args.device
+    TARGET_REGISTRY_ID = args.registry
     TARGET_GATEWAY_ID = args.gateway
     TARGET_SUBFOLDER = args.folder
     TARGET_TYPE = args.type
